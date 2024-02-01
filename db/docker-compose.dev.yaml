@@ -1,0 +1,76 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    image: postgres:${POSTGRES_TAG}
+    container_name: ${PROJECT_NAME}-postgres
+    hostname: postgres
+    restart: always
+    stop_grace_period: 10s
+    env_file: .env.dev
+    environment:
+      POSTGRES_PASSWORD: $DB_PASSWORD
+      POSTGRES_DB: $DB_NAME
+      POSTGRES_USER: $DB_USER
+    ports:
+      - ${POSTGRES_PORT}:5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  mysql:
+    image: mysql:${MYSQL_TAG}
+    container_name: ${PROJECT_NAME}-mysql
+    hostname: mysql
+    restart: always
+    stop_grace_period: 10s
+    env_file: .env.dev
+    environment:
+      MYSQL_ROOT_PASSWORD: $DB_PASSWORD
+      MYSQL_DATABASE: $DB_NAME
+      MYSQL_USER: $DB_USER
+      MYSQL_PASSWORD: $DB_PASSWORD
+    ports:
+      - ${MYSQL_PORT}:3306
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  firebird:
+    image: jacobalberty/firebird:${FIREBIRD_TAG}
+    container_name: ${PROJECT_NAME}-firebird
+    hostname: firebird
+    restart: always
+    stop_grace_period: 10s
+    env_file: .env.dev
+    environment:
+      FIREBIRD_DATABASE: $DB_NAME
+      FIREBIRD_USER: $DB_USER
+      FIREBIRD_PASSWORD: $DB_PASSWORD
+      ISC_PASSWORD: $DB_PASSWORD
+    ports:
+      - ${FIREBIRD_PORT}:3050
+    volumes:
+      - firebird-data:/firebird
+
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:${CLOUDBEAVER_TAG}
+    container_name: ${PROJECT_NAME}-cloudbeaver
+    hostname: cloudbeaver
+    restart: always
+    stop_grace_period: 10s
+    ports:
+      - ${CLOUDBEAVER_PORT}:8978
+    volumes:
+      - cloudbeaver-data:/opt/cloudbeaver/workspace
+      - .:/app
+
+networks:
+  default:
+    name: $PROJECT_NAME
+    driver: bridge
+
+volumes:
+  postgres-data: {}
+  mysql-data: {}
+  firebird-data: {}
+  cloudbeaver-data: {}
